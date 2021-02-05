@@ -21,31 +21,65 @@ jobs:
         node-version: [14.x]
     steps:
       - uses: actions/checkout@v2
-      - name: Set environment variables
+      #- name: Set Node.js packages yarn cache directory
+      #  id: yarn-cache-dir
+      #  run: echo ::set-output name=CACHE_DIR::$(yarn cache dir)
+      - name: Hybrid set environment variables
+        id: env-var
         run: |
           git remote add ssh-origin "https://github.com/$GITHUB_REPOSITORY"
           git fetch ssh-origin
           GIT_BRANCH_REV=$(git rev-parse --abbrev-ref HEAD)
-          echo ::set-env name=GIT_BRANCH::$GIT_BRANCH_REV
-          CONCAT_WEB_URL="https://github.com/RedHatInsights/curiosity-frontend/actions?query=branch%3A$GIT_BRANCH_REV"
-          echo ::set-env name=TRAVIS_BUILD_WEB_URL::$CONCAT_WEB_URL
+          echo ::set-output name=GIT_BRANCH::$GIT_BRANCH_REV
+          echo ::set-output name=TRAVIS_BUILD_WEB_URL::"https://github.com/RedHatInsights/curiosity-frontend/actions?query=branch%3A$GIT_BRANCH_REV"
           GIT_MESSAGE_SHOW=$(git show -s --format='%s')
-          echo ::set-env name=COMMIT_MESSAGE::$GIT_MESSAGE_SHOW
-          echo ::set-env name=TRAVIS_COMMIT_MESSAGE::$GIT_MESSAGE_SHOW
+          echo ::set-output name=COMMIT_MESSAGE::$GIT_MESSAGE_SHOW
+          echo ::set-output name=TRAVIS_COMMIT_MESSAGE::$GIT_MESSAGE_SHOW
       - name: List environment settings
         run: |
           echo "//-------------->"
           echo "APP_BUILD_DIR=$APP_BUILD_DIR"
           echo "BRANCH=$BRANCH"
-          echo "GIT_BRANCH=$GIT_BRANCH"
-          echo "COMMIT_MESSAGE=$COMMIT_MESSAGE"
+          echo "GIT_BRANCH="${{ steps.env-var.outputs.GIT_BRANCH }}
+          echo "COMMIT_MESSAGE="${{ steps.env-var.outputs.COMMIT_MESSAGE }}
           echo "REPO=$REPO"
           echo "REPO_DIR=$REPO_DIR"
           echo "TRAVIS_BRANCH=$TRAVIS_BRANCH"
           echo "TRAVIS_BUILD_NUMBER=$TRAVIS_BUILD_NUMBER"
-          echo "TRAVIS_BUILD_WEB_URL=$TRAVIS_BUILD_WEB_URL"
-          echo "TRAVIS_COMMIT_MESSAGE=$TRAVIS_COMMIT_MESSAGE"
+          echo "TRAVIS_BUILD_WEB_URL="${{ steps.env-var.outputs.TRAVIS_BUILD_WEB_URL }}
+          echo "TRAVIS_COMMIT_MESSAGE="${{ steps.env-var.outputs.TRAVIS_COMMIT_MESSAGE }}
           echo "TRAVIS_EVENT_TYPE=$TRAVIS_EVENT_TYPE"
           echo "TRAVIS_PULL_REQUEST=$TRAVIS_PULL_REQUEST"
           echo "TRAVIS_TAG=$TRAVIS_TAG"
           echo "//-------------->"
+      - name: Consistent list environment settings
+        run: |
+          echo "//-------------->"
+          echo "APP_BUILD_DIR=$ALT_APP_BUILD_DIR"
+          echo "BRANCH=$ALT_BRANCH"
+          echo "GIT_BRANCH=$GIT_BRANCH"
+          echo "COMMIT_MESSAGE=$COMMIT_MESSAGE"
+          echo "REPO=$ALT_REPO"
+          echo "REPO_DIR=$ALT_REPO_DIR"
+          echo "TRAVIS_BRANCH=$ALT_TRAVIS_BRANCH"
+          echo "TRAVIS_BUILD_NUMBER=$ALT_TRAVIS_BUILD_NUMBER"
+          echo "TRAVIS_BUILD_WEB_URL=$TRAVIS_BUILD_WEB_URL"
+          echo "TRAVIS_COMMIT_MESSAGE=$TRAVIS_COMMIT_MESSAGE"
+          echo "TRAVIS_EVENT_TYPE=$ALT_TRAVIS_EVENT_TYPE"
+          echo "TRAVIS_PULL_REQUEST=$ALT_TRAVIS_PULL_REQUEST"
+          echo "TRAVIS_TAG=$ALT_TRAVIS_TAG"
+          echo "//-------------->"
+        env:
+          GIT_BRANCH: ${{ steps.env-var.outputs.GIT_BRANCH }}
+          COMMIT_MESSAGE: ${{ steps.env-var.outputs.COMMIT_MESSAGE }}
+          TRAVIS_BUILD_WEB_URL: ${{ steps.env-var.outputs.TRAVIS_BUILD_WEB_URL }}
+          TRAVIS_COMMIT_MESSAGE: ${{ steps.env-var.outputs.TRAVIS_COMMIT_MESSAGE }}
+          ALT_APP_BUILD_DIR: "build"
+          ALT_BRANCH: ${{ github.ref }}
+          ALT_REPO: "git@github.com:RedHatInsights/curiosity-frontend-build"
+          ALT_REPO_DIR: "curiosity-frontend-build"
+          ALT_TRAVIS_BRANCH: ${{ github.ref }}
+          ALT_TRAVIS_BUILD_NUMBER: "n/a"
+          ALT_TRAVIS_EVENT_TYPE: ${{ github.event_name }}
+          ALT_TRAVIS_PULL_REQUEST: "false"
+          ALT_TRAVIS_TAG: "n/a"
