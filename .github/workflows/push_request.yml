@@ -2,7 +2,6 @@ name: Push request testing as pr
 on:
   push:
     branches: [ ci-action ]
-    paths: [ '!**.md' ]
 env:
   APP_BUILD_DIR: "build"
   BRANCH: ${{ github.ref }}
