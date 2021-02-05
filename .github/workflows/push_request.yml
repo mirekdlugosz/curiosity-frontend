@@ -7,7 +7,7 @@ env:
   BRANCH: ${{ github.ref }}
   REPO: "git@github.com:RedHatInsights/curiosity-frontend-build"
   REPO_DIR: "curiosity-frontend-build"
-  TRAVIS_BRANCH: ${{ env.BRANCH }}
+  TRAVIS_BRANCH: ${{ github.ref }}
   TRAVIS_BUILD_NUMBER: "n/a"
   TRAVIS_EVENT_TYPE: ${{ github.event_name }}
   TRAVIS_PULL_REQUEST: "false"
