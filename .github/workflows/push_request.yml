@@ -5,13 +5,10 @@ on:
 env:
   APP_BUILD_DIR: "build"
   BRANCH: ${{ github.ref }}
-  COMMIT_MESSAGE: $(git show -s --format='%s')
   REPO: "git@github.com:RedHatInsights/curiosity-frontend-build"
   REPO_DIR: "curiosity-frontend-build"
-  TRAVIS_BRANCH: "${BRANCH}"
+  TRAVIS_BRANCH: ${{ env.BRANCH }}
   TRAVIS_BUILD_NUMBER: "n/a"
-  TRAVIS_BUILD_WEB_URL: "https://github.com/RedHatInsights/curiosity-frontend/actions?query=branch%3A${BRANCH}"
-  TRAVIS_COMMIT_MESSAGE: "${COMMIT_MESSAGE}"
   TRAVIS_EVENT_TYPE: ${{ github.event_name }}
   TRAVIS_PULL_REQUEST: "false"
   TRAVIS_TAG: "n/a"
@@ -24,11 +21,23 @@ jobs:
         node-version: [14.x]
     steps:
       - uses: actions/checkout@v2
+      - name: Set environment variables
+        run: |
+          git remote add ssh-origin "https://github.com/$GITHUB_REPOSITORY"
+          git fetch ssh-origin
+          GIT_BRANCH_REV=$(git rev-parse --abbrev-ref HEAD)
+          echo ::set-env name=GIT_BRANCH::$GIT_BRANCH_REV
+          CONCAT_WEB_URL="https://github.com/RedHatInsights/curiosity-frontend/actions?query=branch%3A$GIT_BRANCH_REV"
+          echo ::set-env name=TRAVIS_BUILD_WEB_URL::$CONCAT_WEB_URL
+          GIT_MESSAGE_SHOW=$(git show -s --format='%s')
+          echo ::set-env name=COMMIT_MESSAGE::$GIT_MESSAGE_SHOW
+          echo ::set-env name=TRAVIS_COMMIT_MESSAGE::$GIT_MESSAGE_SHOW
       - name: List environment settings
         run: |
           echo "//-------------->"
           echo "APP_BUILD_DIR=$APP_BUILD_DIR"
           echo "BRANCH=$BRANCH"
+          echo "GIT_BRANCH=$GIT_BRANCH"
           echo "COMMIT_MESSAGE=$COMMIT_MESSAGE"
           echo "REPO=$REPO"
           echo "REPO_DIR=$REPO_DIR"
