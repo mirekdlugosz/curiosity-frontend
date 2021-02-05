@@ -1,6 +1,6 @@
 name: Push request testing as pr
 on:
-  pull_request:
+  push:
     branches: [ master, main, prod, stage, test**, qa**, dev**, ci** ]
     paths: [ '!**.md' ]
 env:
