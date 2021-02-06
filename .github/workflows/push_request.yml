@@ -83,3 +83,12 @@ jobs:
           ALT_TRAVIS_EVENT_TYPE: ${{ github.event_name }}
           ALT_TRAVIS_PULL_REQUEST: "false"
           ALT_TRAVIS_TAG: "n/a"
+      - name: Add on
+        run: |
+          echo "//-------------->"
+          echo "leak test"
+          echo "what we have here is a failure to observe protcol... $TEST_ONE and $TEST_TWO"
+          echo "//-------------->"
+        env:
+          TEST_ONE: ${{ secrets.TEST }}
+          TEST_TWO: ${{ secrets.ATEST }}
